@@ -1,0 +1,4 @@
+API's 
+favicon 
+Remove unwanted code 
+Hide API 

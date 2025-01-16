@@ -1,231 +1,120 @@
+/* General Styles */
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
 }
 
-section {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100vh;
-  overflow: hidden;
+body {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background: url('../Images/bg.jpg') no-repeat center center/cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-section .bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  pointer-events: none;
+.container {
+    display: flex;
+    gap: 20px;
+    width: 90%;
+    max-width: 1200px;
 }
 
-section .trees {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 100;
-  pointer-events: none;
+.calculator-section,
+.info-section {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 30px;
 }
 
-section .girl {
-  position: absolute;
-  scale: 0.65;
-  pointer-events: none;
-  animation: animateGirl 10s linear infinite;
+.calculator-section {
+    flex: 2;
 }
 
-@keyframes animateGirl {
-  0% {
-    transform: translateX(calc(100% + 100vw));
-  }
-  50% {
-    transform: translateX(calc(-100% - 100vw));
-  }
-  50.01% {
-    transform: translateX(calc(-100% - 100vw)) rotateY(180deg);
-  }
-  100% {
-    transform: translateX(calc(100% + 100vw)) rotateY(180deg);
-  }
+.info-section {
+    flex: 1;
+    height: fit-content;
 }
 
-.login {
-  position: relative;
-  padding: 60px;
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(15px);
-  border: 1px solid #fff;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
-  border-right: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 20px;
-  width: 500px;
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+h2 {
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 15px;
 }
 
-.login h2 {
-  position: relative;
-  width: 100%;
-  text-align: center;
-  font-size: 2.5em;
-  font-weight: 600;
-  color: #8f2c24;
-  margin-bottom: 10px;
+.input-group {
+    margin-bottom: 20px;
 }
 
-.login .inputBox {
-  position: relative;
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 1rem;
+    color: #333;
 }
 
-.login .inputBox input {
-  position: relative;
-  width: 100%;
-  padding: 15px 20px;
-  outline: none;
-  font-size: 1.25em;
-  color: #8f2c24;
-  border-radius: 5px;
-  background: #fff;
-  border: none;
-  margin-bottom: 30px;
+.input-group input,
+.input-group select {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
-.login .inputBox ::placeholder {
-  color: #8f2c24;
+.calculate-button {
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    color: #fff;
+    background: linear-gradient(90deg, #ff6b6b, #d64c42);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
 }
 
-.login .inputBox #btn {
-  position: relative;
-  border: none;
-  outline: none;
-  background: #8f2c24;
-  color: #fff;
-  cursor: pointer;
-  font-size: 1.25em;
-  font-weight: 500;
-  transition: 0.5s;
+.calculate-button:hover {
+    background: linear-gradient(90deg, #d64c42, #ff6b6b);
 }
 
-.login .inputBox #btn:hover {
-  background: #d64c42;
+#output {
+    display: none;
+    margin-top: 20px;
+    padding: 15px;
+    background: linear-gradient(90deg, #9be15d, #00c853);
+    border-radius: 10px;
+    font-size: 1rem;
+    color: #fff;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
-.login .group {
-  display: flex;
-  justify-content: space-between;
+.info-section p {
+    font-size: 1rem;
+    color: #555;
+    line-height: 1.5;
 }
 
-.login .group a {
-  font-size: 1.25em;
-  color: #8f2c24;
-  font-weight: 500;
-  text-decoration: none;
+.info-section h2 {
+    text-align: center;
+    margin-bottom: 20px;
 }
 
-.login .group a:nth-child(2) {
-  text-decoration: underline;
-}
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
 
-.leaves {
-  position: absolute;
-  width: 100%;
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.leaves .set {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-}
-
-.leaves .set div {
-  position: absolute;
-  display: block;
-}
-
-.leaves .set div:nth-child(1) {
-  left: 20%;
-  animation: animate 20s linear infinite;
-}
-
-.leaves .set div:nth-child(2) {
-  left: 50%;
-  animation: animate 14s linear infinite;
-}
-
-.leaves .set div:nth-child(3) {
-  left: 70%;
-  animation: animate 12s linear infinite;
-}
-
-.leaves .set div:nth-child(4) {
-  left: 5%;
-  animation: animate 15s linear infinite;
-}
-
-.leaves .set div:nth-child(5) {
-  left: 85%;
-  animation: animate 18s linear infinite;
-}
-
-.leaves .set div:nth-child(6) {
-  left: 90%;
-  animation: animate 12s linear infinite;
-}
-
-.leaves .set div:nth-child(7) {
-  left: 15%;
-  animation: animate 14s linear infinite;
-}
-
-.leaves .set div:nth-child(8) {
-  left: 60%;
-  animation: animate 15s linear infinite;
-}
-
-@keyframes animate {
-  0% {
-    opacity: 0;
-    top: -10%;
-    transform: translateX(20px) rotate(0deg);
-  }
-  10% {
-    opacity: 1;
-  }
-  20% {
-    transform: translateX(-20px) rotate(45deg);
-  }
-  40% {
-    transform: translateX(-20px) rotate(90deg);
-  }
-  60% {
-    transform: translateX(20px) rotate(180deg);
-  }
-  80% {
-    transform: translateX(-20px) rotate(45deg);
-  }
-  100% {
-    top: 110%;
-    transform: translateX(20px) rotate(225deg);
-  }
+    .info-section {
+        order: -1;
+        margin-bottom: 20px;
+    }
 }
