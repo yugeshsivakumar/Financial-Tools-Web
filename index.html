@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Financial Tools</title>
-    <link rel="stylesheet" href="Asserts\css\style.css">
+    <link rel="stylesheet" href="Asserts/css/style.css">
+    <link rel="icon" type="image/png" href="Asserts/Images/favicon.png">
 </head>
 <body>
     <div class="container">
@@ -13,13 +14,28 @@
             <div class="input-group">
                 <label for="tool">Select Tool</label>
                 <select id="tool" onchange="updateToolInfo()">
+                    <option value="currencyConverter" selected>Currency Converter</option>
                     <option value="inflationCalculator">Inflation Adjuster</option>
                     <option value="pppCalculator">Purchasing Power Calculator</option>
-                    <option value="currencyConverter">Currency Converter</option>
                 </select>
             </div>
 
-            <div id="inflationInputs" class="tool-inputs">
+            <div id="currencyConverterInputs" class="tool-inputs">
+                <div class="input-group">
+                    <label for="fromCountry">From Country</label>
+                    <select id="fromCountry"></select>
+                </div>
+                <div class="input-group">
+                    <label for="amountCurrency">Amount</label>
+                    <input type="number" id="amountCurrency" placeholder="Enter Amount">
+                </div>
+                <div class="input-group">
+                    <label for="toCountry">To Country</label>
+                    <select id="toCountry"></select>
+                </div>
+            </div>
+
+            <div id="inflationInputs" class="tool-inputs" style="display: none;">
                 <div class="input-group">
                     <label for="country">Country</label>
                     <input type="text" id="country" placeholder="Enter Country">
@@ -49,22 +65,6 @@
                 </div>
             </div>
 
-            <div id="currencyConverterInputs" class="tool-inputs" style="display: none;">
-                <div class="input-group">
-                    <label for="fromCountry">From Country</label>
-                    <select id="fromCountry"></select>
-                </div>
-                <div class="input-group">
-                    <label for="amountCurrency">Amount</label>
-                    <input type="number" id="amountCurrency" placeholder="Enter Amount">
-                </div>
-                <div class="input-group">
-                    <label for="toCountry">To Country</label>
-                    <select id="toCountry"></select>
-                </div>
-            </div>
-
-
             <button class="calculate-button" onclick="calculateResult()">Calculate</button>
 
             <div id="output"></div>
@@ -77,5 +77,32 @@
     </div>
 
     <script src="Asserts/js/script.js"></script>
+    <script>
+        // Display the default tool inputs and information on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateToolInfo();
+        });
+
+        function updateToolInfo() {
+            const tool = document.getElementById('tool').value;
+
+            // Hide all tool inputs
+            document.getElementById('currencyConverterInputs').style.display = 'none';
+            document.getElementById('inflationInputs').style.display = 'none';
+            document.getElementById('pppInputs').style.display = 'none';
+
+            // Show the selected tool's inputs and update the tool description
+            if (tool === 'currencyConverter') {
+                document.getElementById('currencyConverterInputs').style.display = 'block';
+                document.getElementById('toolDescription').textContent = 'The Currency Converter tool allows you to convert an amount from one currency to another using real-time exchange rates.';
+            } else if (tool === 'inflationCalculator') {
+                document.getElementById('inflationInputs').style.display = 'block';
+                document.getElementById('toolDescription').textContent = 'The Inflation Adjuster helps you understand how the value of money changes over time due to inflation.';
+            } else if (tool === 'pppCalculator') {
+                document.getElementById('pppInputs').style.display = 'block';
+                document.getElementById('toolDescription').textContent = 'The Purchasing Power Calculator compares the cost of living between two countries based on the same amount of money.';
+            }
+        }
+    </script>
 </body>
 </html>
