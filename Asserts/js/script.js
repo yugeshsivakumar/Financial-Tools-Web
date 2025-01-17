@@ -24,7 +24,7 @@ async function updateToolInfo() {
     }
 }
 
-// Function to populate country dropdowns with supported currencies
+// Function to populate country dropdowns for the currency converter
 async function populateCountryDropdowns() {
     const fromCountryDropdown = document.getElementById('fromCountry');
     const toCountryDropdown = document.getElementById('toCountry');
@@ -66,6 +66,57 @@ async function populateCountryDropdowns() {
         toCountryDropdown.appendChild(errorMessage);
     }
 }
+
+// Function to populate country dropdown for the inflation calculator
+// Function to populate country dropdown for the inflation calculator
+async function populateInflationCountryDropdown() {
+    const countryDropdown = document.getElementById('country');
+    countryDropdown.innerHTML = ''; // Clear previous options
+    const apiBaseUrl = 'https://api.worldbank.org/v2/country';
+    let currentPage = 1;
+    let totalPages = 1; // Placeholder to start the loop
+
+    try {
+        while (currentPage <= totalPages) {
+            const response = await fetch(`${apiBaseUrl}?format=json&page=${currentPage}`);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch country list: ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (!data[1] || data[1].length === 0) {
+                throw new Error('No countries found in API response.');
+            }
+
+            // Set totalPages on the first request
+            if (currentPage === 1 && data[0].pages) {
+                totalPages = data[0].pages;
+            }
+
+            // Add countries to the dropdown
+            data[1].forEach((country) => {
+                if (country.id && country.name) {
+                    const option = document.createElement('option');
+                    option.value = country.id; // ISO 3166-1 alpha-3 code
+                    option.textContent = `${country.name} (${country.id})`;
+                    countryDropdown.appendChild(option);
+                }
+            });
+
+            currentPage++;
+        }
+
+        console.log('Inflation country dropdown populated successfully.');
+    } catch (error) {
+        console.error('Error populating inflation country dropdown:', error);
+        const errorMessage = document.createElement('option');
+        errorMessage.textContent = 'Failed to load countries.';
+        countryDropdown.appendChild(errorMessage);
+    }
+}
+
+
+// Function to populate year dropdowns
 function populateYearDropdowns() {
     const baseYearDropdown = document.getElementById('baseYear');
     const currentYearDropdown = document.getElementById('currentYear');
@@ -84,6 +135,7 @@ function populateYearDropdowns() {
         currentYearDropdown.appendChild(currentOption);
     }
 }
+
 // Function to calculate and display the result
 async function calculateResult() {
     const tool = document.getElementById('tool').value;
@@ -114,6 +166,49 @@ async function calculateResult() {
                     result = `Exchange rate for ${toCurrency} not found.`;
                 }
             }
+        } else if (tool === 'inflationCalculator') {
+            const country = document.getElementById('country').value;
+            const baseYear = parseInt(document.getElementById('baseYear').value);
+            const currentYear = parseInt(document.getElementById('currentYear').value);
+            const amountInflation = parseFloat(document.getElementById('amountInflation').value);
+
+            if (!country || isNaN(baseYear) || isNaN(currentYear) || isNaN(amountInflation)) {
+                result = "Please provide valid inputs for the inflation calculation.";
+            } else {
+                // Fetch inflation rate data
+                const response = await fetch(
+                    `https://api.worldbank.org/v2/country/${country}/indicator/FP.CPI.TOTL?format=json&date=${baseYear}:${currentYear}`
+                );
+
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch inflation data: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (!data || !data[1] || data[1].length === 0) {
+                    throw new Error(`No inflation data available for ${country} between ${baseYear} and ${currentYear}.`);
+                }
+
+                // Process inflation data
+                const inflationData = data[1].reduce((acc, entry) => {
+                    if (entry.value !== null) {
+                        acc[entry.date] = entry.value;
+                    }
+                    return acc;
+                }, {});
+
+                if (!inflationData[baseYear] || !inflationData[currentYear]) {
+                    throw new Error(`Insufficient inflation data for the selected years: ${baseYear} or ${currentYear}.`);
+                }
+
+                // Calculate adjusted value
+                const baseCPI = inflationData[baseYear];
+                const currentCPI = inflationData[currentYear];
+                const adjustedValue = (amountInflation * currentCPI) / baseCPI;
+
+                result = `${amountInflation} in ${baseYear} is equivalent to ${adjustedValue.toFixed(2)} in ${currentYear}.`;
+            }
         } else {
             result = "Feature not implemented.";
         }
@@ -128,8 +223,9 @@ async function calculateResult() {
     }
 }
 
-// Initialize the country dropdowns when the page loads
+// Initialize the dropdowns when the page loads
 window.onload = function () {
     populateCountryDropdowns();
+    populateInflationCountryDropdown();
     populateYearDropdowns();
 };

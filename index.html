@@ -38,7 +38,9 @@
             <div id="inflationInputs" class="tool-inputs" style="display: none;">
                 <div class="input-group">
                     <label for="country">Country</label>
-                    <input type="text" id="country" placeholder="Enter Country">
+                    <select id="country">
+                        <option value="">Select</option>
+                    </select>
                 </div>
                 <div class="input-group">
                     <label for="baseYear">Base Year</label>
@@ -90,27 +92,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             updateToolInfo();
         });
-
-        function updateToolInfo() {
-            const tool = document.getElementById('tool').value;
-
-            // Hide all tool inputs
-            document.getElementById('currencyConverterInputs').style.display = 'none';
-            document.getElementById('inflationInputs').style.display = 'none';
-            document.getElementById('pppInputs').style.display = 'none';
-
-            // Show the selected tool's inputs and update the tool description
-            if (tool === 'currencyConverter') {
-                document.getElementById('currencyConverterInputs').style.display = 'block';
-                document.getElementById('toolDescription').textContent = 'The Currency Converter tool allows you to convert an amount from one currency to another using real-time exchange rates.';
-            } else if (tool === 'inflationCalculator') {
-                document.getElementById('inflationInputs').style.display = 'block';
-                document.getElementById('toolDescription').textContent = 'The Inflation Adjuster helps you understand how the value of money changes over time due to inflation.';
-            } else if (tool === 'pppCalculator') {
-                document.getElementById('pppInputs').style.display = 'block';
-                document.getElementById('toolDescription').textContent = 'The Purchasing Power Calculator compares the cost of living between two countries based on the same amount of money.';
-            }
-        }
     </script>
 </body>
 </html>
