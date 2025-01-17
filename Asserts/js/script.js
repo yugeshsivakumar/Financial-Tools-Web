@@ -66,7 +66,24 @@ async function populateCountryDropdowns() {
         toCountryDropdown.appendChild(errorMessage);
     }
 }
+function populateYearDropdowns() {
+    const baseYearDropdown = document.getElementById('baseYear');
+    const currentYearDropdown = document.getElementById('currentYear');
+    const currentYear = new Date().getFullYear();
 
+    for (let year = currentYear; year >= 1900; year--) {
+        const baseOption = document.createElement('option');
+        baseOption.value = year;
+        baseOption.textContent = year;
+
+        const currentOption = document.createElement('option');
+        currentOption.value = year;
+        currentOption.textContent = year;
+
+        baseYearDropdown.appendChild(baseOption);
+        currentYearDropdown.appendChild(currentOption);
+    }
+}
 // Function to calculate and display the result
 async function calculateResult() {
     const tool = document.getElementById('tool').value;
@@ -112,4 +129,7 @@ async function calculateResult() {
 }
 
 // Initialize the country dropdowns when the page loads
-window.onload = populateCountryDropdowns;
+window.onload = function () {
+    populateCountryDropdowns();
+    populateYearDropdowns();
+};

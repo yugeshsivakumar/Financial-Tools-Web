@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Financial Tools</title>
     <link rel="stylesheet" href="Asserts/css/style.css">
-    <link rel="icon" type="image/png" href="Asserts/Images/favicon.png">
+    <link rel="icon" type="image/png" href="Asserts/Images/leaf_01.png">
 </head>
 <body>
     <div class="container">
@@ -41,12 +41,20 @@
                     <input type="text" id="country" placeholder="Enter Country">
                 </div>
                 <div class="input-group">
-                    <label for="date">Date</label>
-                    <input type="date" id="date">
+                    <label for="baseYear">Base Year</label>
+                    <select id="baseYear">
+                        <!-- Years dynamically populated -->
+                    </select>
                 </div>
                 <div class="input-group">
-                    <label for="amount">Amount</label>
-                    <input type="number" id="amount" placeholder="Enter Amount">
+                    <label for="currentYear">Current Year</label>
+                    <select id="currentYear">
+                        <!-- Years dynamically populated -->
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="amountInflation">Amount</label>
+                    <input type="number" id="amountInflation" placeholder="Enter Amount on Base Year">
                 </div>
             </div>
 
