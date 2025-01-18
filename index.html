@@ -20,6 +20,7 @@
                 </select>
             </div>
 
+            <!-- Currency Converter -->
             <div id="currencyConverterInputs" class="tool-inputs">
                 <div class="input-group">
                     <label for="fromCountry">From Country</label>
@@ -35,43 +36,39 @@
                 </div>
             </div>
 
+            <!-- Inflation Adjuster -->
             <div id="inflationInputs" class="tool-inputs" style="display: none;">
                 <div class="input-group">
                     <label for="country">Country</label>
-                    <select id="country">
-                        <option value="">Select</option>
-                    </select>
+                    <select id="country"></select>
                 </div>
                 <div class="input-group">
                     <label for="baseYear">Base Year</label>
-                    <select id="baseYear">
-                        <!-- Years dynamically populated -->
-                    </select>
+                    <select id="baseYear"></select>
                 </div>
                 <div class="input-group">
                     <label for="currentYear">Current Year</label>
-                    <select id="currentYear">
-                        <!-- Years dynamically populated -->
-                    </select>
+                    <select id="currentYear"></select>
                 </div>
                 <div class="input-group">
                     <label for="amountInflation">Amount</label>
-                    <input type="number" id="amountInflation" placeholder="Enter Amount on Base Year">
+                    <input type="number" id="amountInflation" placeholder="Enter Amount in Base Year">
                 </div>
             </div>
 
+            <!-- Purchasing Power Calculator -->
             <div id="pppInputs" class="tool-inputs" style="display: none;">
                 <div class="input-group">
                     <label for="sourceCountry">Source Country</label>
-                    <input type="text" id="sourceCountry" placeholder="Enter Source Country">
+                    <select id="sourceCountry"></select>
                 </div>
                 <div class="input-group">
-                    <label for="sourceAmount">Amount</label>
-                    <input type="number" id="sourceAmount" placeholder="Enter Amount">
+                    <label for="sourceAmount">Amount (in Source Currency)</label>
+                    <input type="number" id="sourceAmount" placeholder="e.g., 100">
                 </div>
                 <div class="input-group">
                     <label for="targetCountry">Target Country</label>
-                    <input type="text" id="targetCountry" placeholder="Enter Target Country">
+                    <select id="targetCountry"></select>
                 </div>
             </div>
 

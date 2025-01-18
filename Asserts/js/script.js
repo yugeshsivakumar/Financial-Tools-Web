@@ -36,9 +36,6 @@ async function populateCountryDropdowns() {
         }
         const data = await response.json();
 
-        // Log API response for debugging
-        console.log('API Response:', data);
-
         const countryList = data.supported_codes; // Expecting array of [currencyCode, countryName]
         if (!countryList || countryList.length === 0) {
             throw new Error('No country codes found in API response.');
@@ -56,22 +53,17 @@ async function populateCountryDropdowns() {
             optionTo.textContent = `${countryName} (${currencyCode})`;
             toCountryDropdown.appendChild(optionTo);
         });
-
-        console.log('Dropdowns populated successfully.');
     } catch (error) {
         console.error('Error populating country dropdowns:', error);
-        const errorMessage = document.createElement('option');
-        errorMessage.textContent = 'Failed to load countries.';
-        fromCountryDropdown.appendChild(errorMessage);
-        toCountryDropdown.appendChild(errorMessage);
+        fromCountryDropdown.innerHTML = '<option value="">Failed to load countries</option>';
+        toCountryDropdown.innerHTML = '<option value="">Failed to load countries</option>';
     }
 }
 
 // Function to populate country dropdown for the inflation calculator
-// Function to populate country dropdown for the inflation calculator
 async function populateInflationCountryDropdown() {
     const countryDropdown = document.getElementById('country');
-    countryDropdown.innerHTML = ''; // Clear previous options
+    countryDropdown.innerHTML = '<option value="">Select a Country</option>'; // Clear previous options
     const apiBaseUrl = 'https://api.worldbank.org/v2/country';
     let currentPage = 1;
     let totalPages = 1; // Placeholder to start the loop
@@ -105,16 +97,11 @@ async function populateInflationCountryDropdown() {
 
             currentPage++;
         }
-
-        console.log('Inflation country dropdown populated successfully.');
     } catch (error) {
         console.error('Error populating inflation country dropdown:', error);
-        const errorMessage = document.createElement('option');
-        errorMessage.textContent = 'Failed to load countries.';
-        countryDropdown.appendChild(errorMessage);
+        countryDropdown.innerHTML = '<option value="">Failed to load countries</option>';
     }
 }
-
 
 // Function to populate year dropdowns
 function populateYearDropdowns() {
@@ -136,11 +123,57 @@ function populateYearDropdowns() {
     }
 }
 
+// Function to populate PPP country dropdowns
+async function populatePppCountryDropdown(dropdownId) {
+    const dropdown = document.getElementById(dropdownId);
+    dropdown.innerHTML = '<option value="">Select a Country</option>'; // Default placeholder
+    const apiBaseUrl = 'https://api.worldbank.org/v2/country';
+    let currentPage = 1;
+    let totalPages = 1;
+
+    try {
+        while (currentPage <= totalPages) {
+            const response = await fetch(`${apiBaseUrl}?format=json&page=${currentPage}`);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch country list: ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (!data[1]) throw new Error('No countries found in the API response.');
+
+            if (currentPage === 1) totalPages = data[0]?.pages || 1;
+
+            data[1].forEach((country) => {
+                const option = document.createElement('option');
+                option.value = country.id; // ISO 3166-1 alpha-3 code
+                option.textContent = `${country.name} (${country.id})`;
+                dropdown.appendChild(option);
+            });
+
+            currentPage++;
+        }
+    } catch (error) {
+        console.error(`Error populating dropdown (${dropdownId}):`, error);
+        dropdown.innerHTML = '<option value="">Failed to load countries</option>';
+    }
+}
+
+// Function to fetch PPP data
+async function fetchPPPData(countryCode) {
+    const response = await fetch(
+        `https://api.worldbank.org/v2/country/${countryCode}/indicator/PA.NUS.PPP?format=json`
+    );
+    if (!response.ok) throw new Error('Failed to fetch PPP data.');
+    const data = await response.json();
+    return data[1]?.[0]?.value;
+}
+
 // Function to calculate and display the result
 async function calculateResult() {
     const tool = document.getElementById('tool').value;
     const output = document.getElementById('output');
-    let result = '';
+    output.textContent = '';
+    output.style.display = 'none';
 
     try {
         if (tool === 'currencyConverter') {
@@ -149,83 +182,87 @@ async function calculateResult() {
             const toCurrency = document.getElementById('toCountry').value;
 
             if (!fromCurrency || !toCurrency || isNaN(amountCurrency)) {
-                result = "Please provide valid input for currency conversion.";
+                output.textContent = "Please provide valid input for currency conversion.";
             } else {
-                // Fetch exchange rate data
                 const response = await fetch(`https://v6.exchangerate-api.com/v6/da49e23b5e4ed0ba22b97b4f/latest/${fromCurrency}`);
-                if (!response.ok) {
-                    throw new Error("Failed to fetch exchange rates. Please check your API key or input.");
-                }
+                if (!response.ok) throw new Error('Failed to fetch exchange rates.');
+
                 const data = await response.json();
                 const rate = data.conversion_rates[toCurrency];
 
                 if (rate) {
-                    const convertedAmount = (rate * amountCurrency).toFixed(2);
-                    result = `${amountCurrency} ${fromCurrency} is equivalent to ${convertedAmount} ${toCurrency}.`;
+                    const convertedAmount = (amountCurrency * rate).toFixed(2);
+                    output.textContent = `${amountCurrency} in ${fromCurrency} is equal to ${convertedAmount} in ${toCurrency}.`;
                 } else {
-                    result = `Exchange rate for ${toCurrency} not found.`;
+                    output.textContent = `Exchange rate for ${toCurrency} not found.`;
                 }
             }
+        } else if (tool === 'pppCalculator') {
+            const sourceCountry = document.getElementById('sourceCountry').value;
+            const targetCountry = document.getElementById('targetCountry').value;
+            const amount = parseFloat(document.getElementById('sourceAmount').value);
+
+            if (!sourceCountry || !targetCountry || isNaN(amount) || amount <= 0) {
+                output.textContent = 'Please select both countries and enter a valid amount.';
+                return;
+            }
+
+            const [pppSource, pppTarget] = await Promise.all([
+                fetchPPPData(sourceCountry),
+                fetchPPPData(targetCountry),
+            ]);
+
+            if (!pppSource || !pppTarget) {
+                throw new Error('PPP data unavailable for one or both countries.');
+            }
+
+            const pppRatio = pppTarget / pppSource;
+            const equivalentAmount = (pppRatio * amount).toFixed(2);
+            const reversePPP = (1 / pppRatio).toFixed(2);
+
+            output.textContent = `The purchasing power of ${amount} in ${sourceCountry} is equivalent to ${equivalentAmount} in ${targetCountry},In other words, if you spend 1 unit of currency in ${sourceCountry} to buy an item, you would need to spend ${reversePPP} units of ${sourceCountry} currency to buy the same item in ${targetCountry}.`;
         } else if (tool === 'inflationCalculator') {
             const country = document.getElementById('country').value;
-            const baseYear = parseInt(document.getElementById('baseYear').value);
-            const currentYear = parseInt(document.getElementById('currentYear').value);
+            const baseYear = document.getElementById('baseYear').value;
+            const currentYear = document.getElementById('currentYear').value;
             const amountInflation = parseFloat(document.getElementById('amountInflation').value);
 
-            if (!country || isNaN(baseYear) || isNaN(currentYear) || isNaN(amountInflation)) {
-                result = "Please provide valid inputs for the inflation calculation.";
+            if (!country || isNaN(amountInflation) || !baseYear || !currentYear) {
+                output.textContent = "Please provide valid inputs for the inflation calculation.";
             } else {
-                // Fetch inflation rate data
                 const response = await fetch(
                     `https://api.worldbank.org/v2/country/${country}/indicator/FP.CPI.TOTL?format=json&date=${baseYear}:${currentYear}`
                 );
 
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch inflation data: ${response.status}`);
-                }
+                if (!response.ok) throw new Error('Failed to fetch inflation data.');
 
                 const data = await response.json();
-
-                if (!data || !data[1] || data[1].length === 0) {
-                    throw new Error(`No inflation data available for ${country} between ${baseYear} and ${currentYear}.`);
-                }
-
-                // Process inflation data
                 const inflationData = data[1].reduce((acc, entry) => {
-                    if (entry.value !== null) {
-                        acc[entry.date] = entry.value;
-                    }
+                    if (entry.value !== null) acc[entry.date] = entry.value;
                     return acc;
                 }, {});
 
-                if (!inflationData[baseYear] || !inflationData[currentYear]) {
-                    throw new Error(`Insufficient inflation data for the selected years: ${baseYear} or ${currentYear}.`);
+                if (inflationData[baseYear] && inflationData[currentYear]) {
+                    const adjustedValue = (amountInflation * inflationData[currentYear]) / inflationData[baseYear];
+                    output.textContent = `${amountInflation} in ${baseYear} is equal to ${adjustedValue.toFixed(2)} in ${currentYear}.`;
+                } else {
+                    output.textContent = 'Insufficient data for the selected years.';
                 }
-
-                // Calculate adjusted value
-                const baseCPI = inflationData[baseYear];
-                const currentCPI = inflationData[currentYear];
-                const adjustedValue = (amountInflation * currentCPI) / baseCPI;
-
-                result = `${amountInflation} in ${baseYear} is equivalent to ${adjustedValue.toFixed(2)} in ${currentYear}.`;
             }
-        } else {
-            result = "Feature not implemented.";
         }
-
-        // Display the result
-        output.textContent = result;
-        output.style.display = 'block';
     } catch (error) {
-        console.error('Error in calculation:', error);
         output.textContent = `Error: ${error.message}`;
-        output.style.display = 'block';
     }
+
+    output.style.display = 'block';
 }
 
-// Initialize the dropdowns when the page loads
-window.onload = function () {
+// Initialize dropdowns on page load
+document.addEventListener('DOMContentLoaded', () => {
+    populatePppCountryDropdown('sourceCountry');
+    populatePppCountryDropdown('targetCountry');
     populateCountryDropdowns();
     populateInflationCountryDropdown();
     populateYearDropdowns();
-};
+    updateToolInfo();
+});
