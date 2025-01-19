@@ -13,10 +13,10 @@ async function updateToolInfo() {
 
     // Show the inputs for the selected tool
     if (tool === 'inflationCalculator') {
-        toolDescription.textContent = "Adjust an amount for inflation to find its equivalent value today.";
+        toolDescription.innerHTML = "Adjust an amount for inflation to find its equivalent value today.<br>⚠️ <strong>\"Note: Data available from 1974 to 2023 only. Some countries data are also no longer available.\"</strong>";
         inflationInputs.style.display = 'block';
     } else if (tool === 'pppCalculator') {
-        toolDescription.textContent = "Compare purchasing power between two countries.";
+        toolDescription.innerHTML = "Compare purchasing power between two countries.<br>⚠️ <strong>\"Some countries data not available now.\"</strong>";
         pppInputs.style.display = 'block';
     } else if (tool === 'currencyConverter') {
         toolDescription.textContent = "Convert an amount from one currency to another.";
